@@ -5,7 +5,7 @@ h_plate = 5;
 r_plate_corner = 2;
 
 // bracket mounting hole parameters
-d_plate_bolt = 5;
+d_plate_bolt = 6;
 x_hole_space = 38.76+d_plate_bolt;
 y_hole_space = 59.45+d_plate_bolt;
 
@@ -17,7 +17,7 @@ w_bracket = 30;
 l_bracket = 22;
 bracket_thickness = 4;
 l_bracket_support = (l_plate-l_opening-2*bracket_thickness)/2; // length of piece above & below bracket
-d_bracket_bolt = 5;
+d_bracket_bolt = 6;
 $fn=50;
 
 
