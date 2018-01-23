@@ -1,3 +1,4 @@
+// mounting plate parameters
 w_plate = 66.1;
 l_plate = 82.4;
 h_plate = 5;
@@ -14,8 +15,8 @@ l_opening = 40.5;
 
 w_bracket = 30;
 l_bracket = 22;
-l_bracket_support = 20; // length of piece above & below bracket
 bracket_thickness = 4;
+l_bracket_support = (l_plate-l_opening-2*bracket_thickness)/2; // length of piece above & below bracket
 d_bracket_bolt = 6;
 
 // TODO: add opening between brackets
@@ -34,7 +35,9 @@ module mounting_plate() {
                 translate([i*x_hole_space/2, j*y_hole_space/2,h_plate/2])
                 cylinder(h=2*h_plate, r=d_plate_bolt, center=true);
             }
-        }        
+        }
+        translate([0,0,h_plate/2])
+            cube([w_opening,l_opening,2*h_plate],center=true);
     }
 }
 
@@ -60,9 +63,10 @@ module mounting_bracket() {
 union() {
     mounting_plate();
     for (i=[0:1]) {
-        translate([0,-l_opening/2+i*l_opening,h_plate]) // translate to either side of bracket opening
+        translate([0,-l_opening/2-bracket_thickness+i*(l_opening+2*bracket_thickness),h_plate]) // translate to either side of bracket opening
         rotate([0,0,i*180])             // rotate 2nd bracket only
         translate([-w_bracket/2,0,0])   // move bracket corner from orgin so it's center aligned with hole
         mounting_bracket();
     }
 }
+
