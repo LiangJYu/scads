@@ -3,54 +3,66 @@ l_plate = 82.4;
 h_plate = 5;
 r_plate_corner = 2;
 
-d_bolt = 5;
-x_hole_space = 38.76+d_bolt;
-y_hole_space = 59.45+d_bolt;
+// bracket mounting hole parameters
+d_plate_bolt = 5;
+x_hole_space = 38.76+d_plate_bolt;
+y_hole_space = 59.45+d_plate_bolt;
 
+// bracket opening parameters
+w_opening = 30;
+l_opening = 40.5;
+
+w_bracket = 30;
+l_bracket = 22;
+l_bracket_support = 20; // length of piece above & below bracket
+bracket_thickness = 4;
+d_bracket_bolt = 6;
+
+// TODO: add opening between brackets
 module mounting_plate() {
     difference() {
+        // extrude to spec'd height
         linear_extrude(height=h_plate) {
-            offset(r=r_plate_corner) 
+            // add corners
+            offset(r=r_plate_corner)
+            // create square plate w/o corners
             square([w_plate-r_plate_corner*2, l_plate-r_plate_corner*2], center=true);
         }
+        // create 4 holes based on spacing parameters to be subtracted
         for (i=[-1:2:1]) {
             for (j=[-1:2:1]) {
                 translate([i*x_hole_space/2, j*y_hole_space/2,h_plate/2])
-                cylinder(h=2*h_plate, r=d_bolt, center=true);
+                cylinder(h=2*h_plate, r=d_plate_bolt, center=true);
             }
-        }
+        }        
     }
 }
 
 module mounting_bracket() {
     difference() {
-        cube([30,4,22]);
-        translate([30/2,4/2,22/2])
+        // plate perpindicular to mounting plate
+        cube([w_bracket,bracket_thickness,l_bracket]);
+        // hole for mounting bolt
+        translate([w_bracket/2,bracket_thickness/2,l_bracket/2])
         rotate([90,0,0])
-        cylinder(h=2*4, r=6, center=true);
+        cylinder(h=2*bracket_thickness, r=d_bracket_bolt, center=true);
     }
+    // create 2 bracket supports
     for (i=[0,1]) {
-        translate([4++i*(30-4),0,0])
-        rotate([90,0,0])
-        rotate([0,-90,0])
-        linear_extrude(height=4)    
-        polygon([[0,0],[0,22],[20,0]]);
+        translate([bracket_thickness+i*(w_bracket-bracket_thickness),0,0])  // translate to edge
+        rotate([90,0,0])    // rotate in x 2nd
+        rotate([0,-90,0])   // rotate in y 1st
+        linear_extrude(height=bracket_thickness)    // extrude to spec'd thickness
+        polygon([[0,0],[0,l_bracket],[l_bracket_support,0]]);   // create triangle to spec
     }
-    /*
-    for (i=[0,1]) {
-        translate([i*(30-4),-20,0])
-        cube([4,20,22]);
-    }
-    */
-    
 }
 
 union() {
     mounting_plate();
     for (i=[0:1]) {
-    translate([0,-l_plate/4+i*l_plate/2,h_plate])
-    rotate([0,0,i*180])
-    translate([-15,0,0])
-    mounting_bracket();
+        translate([0,-l_opening/2+i*l_opening,h_plate]) // translate to either side of bracket opening
+        rotate([0,0,i*180])             // rotate 2nd bracket only
+        translate([-w_bracket/2,0,0])   // move bracket corner from orgin so it's center aligned with hole
+        mounting_bracket();
     }
 }
