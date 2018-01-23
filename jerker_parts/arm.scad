@@ -13,6 +13,8 @@ d_holes = 5;
 support_thickness = 4;
 $fn=50;
 
+// TODO: break into 2; speaker seat and arm parts for easier printing
+
 module speaker_seat() {
     w_offset = w_speaker_seat-2*r_plate_corner;
     l_offset = l_speaker_seat-2*r_plate_corner;
@@ -28,11 +30,14 @@ module speaker_seat() {
                 cylinder(h=h_speaker_seat/2, r=r_plate_corner,center=true);
             }
         }
-        // holes
+        // holes perpindicular to direction of arm
         for (i=[-1:2:1]) {
             translate([h_speaker_seat/2,i*(d_arm_under_seat/2-d_holes),-h_speaker_seat/2])
             cylinder(r=d_holes/2, h=2*h_speaker_seat, center=true);
         }
+        // holes in direction of arm
+        translate([d_arm_under_seat-19,0,-h_speaker_seat/2])
+        cylinder(r=d_holes/2, h=2*h_speaker_seat, center=true);
     }
 }
 
@@ -43,8 +48,9 @@ module speaker_arm_bottom() {
         // hole for attaching to bracket
         translate([d_arm_under_seat+19,w_arm/2,-h_arm/2]) 
         cylinder(r=d_holes/2, h=2*h_arm);
-        //translate([d_arm_under_seat-19,w_arm/2,-h_arm/2])
-        //cylinder(r=d_holes/2, h=2*h_arm);
+        // hole for attaching in direction of arm
+        translate([d_arm_under_seat-19,w_arm/2,-h_arm/2])
+        cylinder(r=d_holes/2, h=2*h_arm);
     }
 }
 
@@ -52,6 +58,7 @@ module speaker_support() {
     difference() {
         translate([0,-50,0])
         cube([h_speaker_seat,d_arm_under_seat,4]);
+        // holes perpindicular to direction of arm
         for (i=[-1:2:1]) {
             translate([h_speaker_seat/2,i*(d_arm_under_seat/2-d_holes),4/2])
             cylinder(r=d_holes/2, h=2*support_thickness, center=true);
