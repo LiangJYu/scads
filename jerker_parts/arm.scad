@@ -9,7 +9,7 @@ l_arm = 130;
 h_arm = 40.2;
 w_arm = 20.25;
 d_arm_under_seat = 100;
-d_holes = 5;
+d_holes = 6;
 support_thickness = 4;
 $fn=50;
 
