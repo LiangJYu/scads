@@ -23,6 +23,17 @@ r_fillet = 2;
 $fn=50;
 
 
+module fillet(length, r=r_fillet) {
+    linear_extrude(height=length) {
+    difference() {
+        square(r);
+        translate([r,r,0])
+        circle(r);
+    }
+}
+}
+
+// subpart the holds the arm
 module mounting_plate() {
     difference() {
         // extrude to spec'd height
@@ -47,6 +58,7 @@ module mounting_plate() {
     }
 }
 
+// sub part that go on the wall
 module mounting_bracket() {
     difference() {
         // plate perpindicular to mounting plate
@@ -54,18 +66,63 @@ module mounting_bracket() {
         // hole for mounting bolt
         translate([w_bracket/2,bracket_thickness/2,l_bracket/2])
         rotate([90,0,0])
-        cylinder(h=2*bracket_thickness, r=d_bracket_bolt/2, center=true);
+        cylinder(h=2*bracket_thickness, r=d_bracket_bolt/2, center=true);        
     }
+    // fillet bracket to base plate    
+    translate([w_bracket-bracket_thickness,0,0])
+    rotate([0,0,-90])
+    rotate([90,0,0])
+    fillet(w_bracket-2*bracket_thickness);    
     // create 2 bracket supports
     for (i=[0,1]) {
-        translate([bracket_thickness+i*(w_bracket-bracket_thickness),0,0])  // translate to edge
-        rotate([90,0,0])    // rotate in x 2nd
-        rotate([0,-90,0])   // rotate in y 1st
-        linear_extrude(height=bracket_thickness)    // extrude to spec'd thickness
-        polygon([[0,0],[0,l_bracket],[l_bracket_support,0]]);   // create triangle to spec
+        difference() {
+            union() {
+                 // translate to edge
+                translate([bracket_thickness+i*(w_bracket-bracket_thickness),0,0]) {
+                    rotate([0,0,-90])
+                    rotate([90,0,0])
+                    linear_extrude(height=bracket_thickness)
+                    square([l_bracket_support,l_bracket]);
+                    // fillet 1 bracket support to base plate
+                    translate([0,bracket_thickness,0])
+                    rotate([90,0,0])
+                    fillet(l_bracket_support+bracket_thickness);
+                    // fillet 2 bracket support to base plate
+                    translate([-bracket_thickness,bracket_thickness,0])
+                    rotate([90,0,0]) 
+                    rotate([0,0,90])
+                    // fillet 3 bracket support to bracket
+                    fillet(l_bracket_support+bracket_thickness);
+                    translate([-i*bracket_thickness,0,0])
+                    rotate([0,0,-90+i*270])
+                    fillet(l_bracket);
+                }
+            }
+            h_extrude = 2*(bracket_thickness+2*r_fillet);
+            h_diff = h_extrude/4;
+            buffer = 1.1;
+            translate([-h_diff+i*(w_bracket-bracket_thickness),(buffer-1)*l_bracket_support/2,-(buffer-1)*l_bracket/2])
+            rotate([0,0,180])
+            rotate([0,-90,0])
+            linear_extrude(height=h_extrude)
+            polygon([[l_bracket*buffer,l_bracket_support*buffer],[l_bracket*buffer,0],[0,l_bracket_support*buffer]]);
+        }
     }
 }
+mounting_bracket();
 
+//h_extrude = 2*(bracket_thickness+r_fillet);
+//            h_diff = h_extrude/4;
+//            //color("red")
+//buffer = 1.1;color("blue")
+//            translate([-h_diff,(buffer-1)*l_bracket_support/2,-(buffer-1)*l_bracket/2])
+//            rotate([0,0,180])
+//            rotate([0,-90,0])
+//            linear_extrude(height=h_extrude)
+//
+//            polygon([[l_bracket*buffer,l_bracket_support*buffer],[l_bracket*buffer,0],[0,l_bracket_support*buffer]]);
+
+/*
 union() {
     mounting_plate();
     for (i=[0:1]) {
@@ -75,4 +132,4 @@ union() {
         mounting_bracket();
     }
 }
-
+*/
