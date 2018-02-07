@@ -5,7 +5,7 @@ h_plate = 5;
 r_plate_corner = 2;
 
 // bracket mounting hole parameters
-d_plate_bolt = 6;
+d_plate_bolt = 6.05;
 x_hole_space = 38.76+d_plate_bolt;
 y_hole_space = 59.45+d_plate_bolt;
 
@@ -18,6 +18,8 @@ l_bracket = 22;
 bracket_thickness = 4;
 l_bracket_support = (l_plate-l_opening-2*bracket_thickness)/2; // length of piece above & below bracket
 d_bracket_bolt = 6;
+
+r_fillet = 2;
 $fn=50;
 
 
@@ -37,8 +39,11 @@ module mounting_plate() {
                 cylinder(h=2*h_plate, r=d_plate_bolt/2, center=true);
             }
         }
-        translate([0,0,h_plate/2])
-            cube([w_opening,l_opening,2*h_plate],center=true);
+        // create opening in middle of mounting plate
+        translate([0,0,-h_plate/2])
+            linear_extrude(height=2*h_plate)        
+                offset(r=r_plate_corner)
+                    square([w_opening-r_plate_corner*2, l_opening-r_plate_corner*2],center=true);
     }
 }
 
