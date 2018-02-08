@@ -5,9 +5,9 @@ h_plate = 5;
 r_plate_corner = 2;
 
 // bracket mounting hole parameters
-d_plate_bolt = 6.05;
-x_hole_space = 38.76+d_plate_bolt;
-y_hole_space = 59.45+d_plate_bolt;
+d_bolt = 6.4;
+x_hole_space = 38.76+d_bolt;
+y_hole_space = 60.45+d_bolt;
 
 // bracket opening parameters
 w_opening = 30;
@@ -17,7 +17,7 @@ w_bracket = 30;
 l_bracket = 22;
 bracket_thickness = 4;
 l_bracket_support = (l_plate-l_opening-2*bracket_thickness)/2; // length of piece above & below bracket
-d_bracket_bolt = 6;
+d_bracket_bolt = 6.4;
 
 r_fillet = 2;
 $fn=50;
@@ -33,7 +33,7 @@ module fillet(length, r=r_fillet) {
 }
 }
 
-// subpart the holds the arm
+// subpart that goes on the post
 module mounting_plate() {
     difference() {
         // extrude to spec'd height
@@ -47,7 +47,7 @@ module mounting_plate() {
         for (i=[-1:2:1]) {
             for (j=[-1:2:1]) {
                 translate([i*x_hole_space/2, j*y_hole_space/2,h_plate/2])
-                cylinder(h=2*h_plate, r=d_plate_bolt/2, center=true);
+                cylinder(h=2*h_plate, r=d_bolt/2, center=true);
             }
         }
         // create opening in middle of mounting plate
@@ -58,7 +58,7 @@ module mounting_plate() {
     }
 }
 
-// sub part that go on the wall
+// subpart the holds the arm
 module mounting_bracket() {
     difference() {
         // plate perpindicular to mounting plate
@@ -66,7 +66,7 @@ module mounting_bracket() {
         // hole for mounting bolt
         translate([w_bracket/2,bracket_thickness/2,l_bracket/2])
         rotate([90,0,0])
-        cylinder(h=2*bracket_thickness, r=d_bracket_bolt/2, center=true);        
+        cylinder(h=2*bracket_thickness, r=d_bolt/2, center=true);        
     }
     // fillet bracket to base plate    
     translate([w_bracket-bracket_thickness,0,0])
@@ -109,20 +109,7 @@ module mounting_bracket() {
         }
     }
 }
-mounting_bracket();
 
-//h_extrude = 2*(bracket_thickness+r_fillet);
-//            h_diff = h_extrude/4;
-//            //color("red")
-//buffer = 1.1;color("blue")
-//            translate([-h_diff,(buffer-1)*l_bracket_support/2,-(buffer-1)*l_bracket/2])
-//            rotate([0,0,180])
-//            rotate([0,-90,0])
-//            linear_extrude(height=h_extrude)
-//
-//            polygon([[l_bracket*buffer,l_bracket_support*buffer],[l_bracket*buffer,0],[0,l_bracket_support*buffer]]);
-
-/*
 union() {
     mounting_plate();
     for (i=[0:1]) {
@@ -132,4 +119,3 @@ union() {
         mounting_bracket();
     }
 }
-*/
