@@ -6,8 +6,8 @@ r_plate_corner = 2;
 
 // bracket mounting hole parameters
 d_bolt = 6.4;
-x_hole_space = 38.76+d_bolt;
-y_hole_space = 60.45+d_bolt;
+x_hole_space = 37+d_bolt;
+y_hole_space = 57+d_bolt;
 
 // bracket opening parameters
 w_opening = 30;
@@ -47,7 +47,7 @@ module mounting_plate() {
         for (i=[-1:2:1]) {
             for (j=[-1:2:1]) {
                 translate([i*x_hole_space/2, j*y_hole_space/2,h_plate/2])
-                cylinder(h=2*h_plate, r=d_bolt/2, center=true);
+                cylinder(h=2*h_plate, d=d_bolt, center=true);
             }
         }
         // create opening in middle of mounting plate
