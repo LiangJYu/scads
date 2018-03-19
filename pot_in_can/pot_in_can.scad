@@ -122,11 +122,27 @@ module watering_hole_shell() {
     }
 }
 
+module watering_hole() {
+    r = 1.15*d_can_lower;
+    angle = 30;
+    h_water = (1-percent_lower)*h_can;
+    difference() {
+        // watering tube
+        translate([r*cos(angle),r*sin(angle),-thickness/2])
+            rotate([0,0,angle]) scale([1.15,0.7,1])
+                translate([0,0,-buffer/2])
+                    cylinder(d=d_can_lower-thickness, h=h_water+buffer);
+        // trim outside upper container
+        translate([0,0,-buffer])
+            outer_ring_upper();
+    }
+}
+
 difference() {
     rotate_extrude()
         half_profile();
     soak_holes(8, h_can-h_can_lower/2);
     soak_holes(6, (h_can+h_can_upper-h_can_lower)/2);
+    watering_hole();
 }
 watering_hole_shell();
-//outer_ring_upper();
