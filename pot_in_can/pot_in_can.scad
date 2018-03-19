@@ -1,4 +1,5 @@
 $fn = 150;
+buffer = 20;
 
 // adjustable parameters
 d_can_upper = 73;
@@ -18,10 +19,10 @@ h_can_upper = h_can * percent_upper;
 h_can_lower = h_can * percent_lower;
 r_can_upper = d_can_upper / 2;
 r_can_lower = d_can_lower / 2;
-
-module connector_2d() {
     h_connect_lo = (1-percent_lower)*h_can;
     h_connect_up = percent_upper*h_can;
+
+module connector_2d() {
     points = [[r_can_upper-thickness/2-gap,h_connect_up],
                 [r_can_upper+thickness/2-gap,h_connect_up],
                 [r_can_lower+thickness,h_connect_lo],
@@ -80,19 +81,52 @@ module half_profile() {
     }
 }
 
+
+module outer_ring_upper() {
+    difference() {
+        translate([0,0,(2*d_can_upper-thickness)/2])
+            cube(2*d_can_upper, center=true);
+        translate([0,0,(2*d_can_upper)/2])
+            cylinder(d=d_can_upper-(thickness+gap/2),h=2*d_can_upper+buffer, center=true);
+    }
+}
+
+module outer_ring_mid() {
+    rotate_extrude() {
+        points = [[r_can_upper+thickness/2-gap,h_connect_up],
+                    [r_can_lower+thickness,h_connect_lo],
+                    [r_can_upper+thickness/2-gap,h_connect_lo]];
+        polygon(points);
+    }
+}
+
+module watering_hole_shell() {
+    r = 1.15*d_can_lower;
+    angle = 30;
+    h_water = (1-percent_lower)*h_can;
+    difference() {
+        // watering tube
+        translate([r*cos(angle),r*sin(angle),-thickness/2])
+            rotate([0,0,angle]) scale([1.15,0.7,1])
+                difference() {
+                    cylinder(d=d_can_lower, h=h_water);
+                    translate([0,0,-buffer/2])
+                        cylinder(d=d_can_lower-thickness, h=h_water+buffer);
+                }
+        // trim outside upper container
+        translate([0,0,-buffer/2])
+            outer_ring_upper();
+        // trim outside mid container
+        translate([0,0,0])
+            outer_ring_mid();
+    }
+}
+
 difference() {
     rotate_extrude()
         half_profile();
     soak_holes(8, h_can-h_can_lower/2);
     soak_holes(6, (h_can+h_can_upper-h_can_lower)/2);
 }
-
-//color("blue")
-//translate([0,-1])
-//    square([r_can_upper, 2]);
-//color("red")
-//translate([0,-2])
-//    square([r_can_upper-gap/2, 1]);
-//color("green")
-//translate([0,2])
-//    square([r_can_upper+gap/2, 1]);
+watering_hole_shell();
+//outer_ring_upper();
